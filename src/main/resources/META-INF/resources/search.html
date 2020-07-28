@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Find Your Relative</title>
+
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+
+
+</head>
+<body>
+
+<div class="container">
+  <div>
+    <div class="sect1">
+      <div class="sectionbody">
+        <div class="sect2">
+          <h3 id="_using_the_finder_service">Find Your Relative</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom: 20px;">
+    <div class="card-body">
+      <form>
+        <div class="form-group">
+          <div style="display: inline">
+            <p>
+              <label for="evacueeName">Name of the evacuee:</label>
+              <input type="text" class="form-control" id="evacueeName">
+            </p>
+          </div>
+        </div>
+        <div>
+          <button id="searchIncidents" type="submit" class="btn btn-success">Search</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom: 20px;">
+    <div class="card-header">
+      Result
+    </div>
+    <div class="card-body">
+      <pre><code id="result"></code></pre>
+    </div>
+  </div>
+</div>
+
+<script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+<script>
+    $(document).ready(function () {
+      $("#searchIncidents").click(function (e) {
+        e.preventDefault();
+
+        var evacueeName = $("#evacueeName").val() || "John Doe";
+        evacueeName = encodeURIComponent(evacueeName);
+        console.log(evacueeName);
+        var endpoint = `/incidents?name=${evacueeName}`;
+        $.getJSON(endpoint, function (resp) {
+          $("#result").text(JSON.stringify(resp, null, 2));
+        }).fail(function () {
+          $("#result").text("An error has occurred. Please check the logs of the application for more details");
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
