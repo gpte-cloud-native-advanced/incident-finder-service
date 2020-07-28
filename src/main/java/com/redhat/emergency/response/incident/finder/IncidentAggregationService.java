@@ -11,6 +11,7 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.web.client.WebClient;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,9 @@ public class IncidentAggregationService {
     @ConfigProperty(name = "incident-aggregation-service.url")
     String serviceUrl;
 
+    @Inject
+    JsonWebToken jsonWebToken;
+
     WebClient webClient;
 
     void onStart(@Observes StartupEvent e) {
@@ -34,7 +38,8 @@ public class IncidentAggregationService {
     }
 
     public Uni<JsonObject> incidentById(String id) {
-        return webClient.get("/incident/" + id).send().onItem().transform(resp -> {
+        log.info("Token = " +  jsonWebToken.getTokenID());
+        return webClient.get("/incident/" + id).bearerTokenAuthentication(jsonWebToken.getRawToken()).send().onItem().transform(resp -> {
             if (resp.statusCode() == 404) {
                 log.warn("Incident with id + " + id + " not found");
                 return new JsonObject();
@@ -46,5 +51,4 @@ public class IncidentAggregationService {
             }
         });
     }
-
 }

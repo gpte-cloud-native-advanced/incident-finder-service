@@ -9,6 +9,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonArray;
@@ -26,10 +27,14 @@ public class IncidentResource {
     @Inject
     IncidentAggregationService incidentAggregationService;
 
+    @Inject
+    SecurityIdentity securityIdentity;
+
     @GET
     @Path("/incidents")
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> getIncidents(@QueryParam("name") String name) {
+        log.info("Principal: " + securityIdentity.getPrincipal().getName());
         return incidentService.incidentsByName(name)
                 .onItem().transformToMulti(list -> Multi.createFrom().iterable(list))
                 .onItem().transformToUni(id -> incidentAggregationService.incidentById(id))
@@ -39,7 +44,4 @@ public class IncidentResource {
                 .onItem().transform(jsonArray -> Response.ok(jsonArray.encodePrettily()).build())
                 .onFailure().recoverWithUni(() -> Uni.createFrom().item(Response.status(500).build()));
     }
-
-
-
 }
