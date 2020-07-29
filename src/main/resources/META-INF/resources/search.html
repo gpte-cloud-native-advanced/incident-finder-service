@@ -61,7 +61,7 @@
     $(document).ready(function () {
       $("#searchIncidents").click(function (e) {
         e.preventDefault();
-
+        $("#result").text("Searching...");
         var evacueeName = $("#evacueeName").val() || "John Doe";
         evacueeName = encodeURIComponent(evacueeName);
         console.log(evacueeName);
