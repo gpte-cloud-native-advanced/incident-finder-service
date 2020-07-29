@@ -36,12 +36,13 @@ public class IncidentAggregationService {
     public Uni<JsonObject> incidentById(String id) {
         return webClient.get("/incident/" + id).send().onItem().apply(resp -> {
             if (resp.statusCode() == 404) {
+                log.warn("Incident with id + " + id + " not found");
                 return new JsonObject();
             } else if (resp.statusCode() != 200) {
                 log.error("Error when calling incident aggregation service. Return code " + resp.statusCode());
                 throw new IllegalStateException(Integer.toString(resp.statusCode()));
             } else {
-                return  resp.bodyAsJsonObject();
+                return resp.bodyAsJsonObject();
             }
         });
     }
