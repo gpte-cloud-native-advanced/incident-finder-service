@@ -34,7 +34,7 @@ public class IncidentAggregationService {
     }
 
     public Uni<JsonObject> incidentById(String id) {
-        return webClient.get("/incident/" + id).send().onItem().apply(resp -> {
+        return webClient.get("/incident/" + id).send().onItem().transform(resp -> {
             if (resp.statusCode() == 404) {
                 log.warn("Incident with id + " + id + " not found");
                 return new JsonObject();

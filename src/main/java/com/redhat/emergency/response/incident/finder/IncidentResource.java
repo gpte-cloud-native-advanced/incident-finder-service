@@ -31,12 +31,12 @@ public class IncidentResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> getIncidents(@QueryParam("name") String name) {
         return incidentService.incidentsByName(name)
-                .onItem().produceMulti(list -> Multi.createFrom().iterable(list))
-                .onItem().produceUni(id -> incidentAggregationService.incidentById(id))
+                .onItem().transformToMulti(list -> Multi.createFrom().iterable(list))
+                .onItem().transformToUni(id -> incidentAggregationService.incidentById(id))
                 .concatenate().collectItems().asList()
-                .onItem().apply(list -> list.stream().filter(j -> j.containsKey("id")).collect(Collectors.toList()))
-                .onItem().apply(JsonArray::new)
-                .onItem().apply(jsonArray -> Response.ok(jsonArray.encodePrettily()).build())
+                .onItem().transform(list -> list.stream().filter(j -> j.containsKey("id")).collect(Collectors.toList()))
+                .onItem().transform(JsonArray::new)
+                .onItem().transform(jsonArray -> Response.ok(jsonArray.encodePrettily()).build())
                 .onFailure().recoverWithUni(() -> Uni.createFrom().item(Response.status(500).build()));
     }
 

@@ -44,15 +44,15 @@ public class IncidentService {
             name = name + "%25";
         }
         name = name.replaceAll("\\s+", "%20");
-        return webClient.get("/incidents/byname/" + name).send().onItem().apply(resp -> {
-           if (resp.statusCode() != 200) {
-               log.error("Error when calling incident service. Return code " + resp.statusCode());
+        return webClient.get("/incidents/byname/" + name).send().onItem().transform(resp -> {
+            if (resp.statusCode() != 200) {
+                log.error("Error when calling incident service. Return code " + resp.statusCode());
                 throw new IllegalStateException(Integer.toString(resp.statusCode()));
-           } else {
-               JsonArray array = resp.bodyAsJsonArray();
-               return array.stream().map(o -> (JsonObject)o).map(j -> j.getString("id"))
-                       .collect(Collectors.toList());
-           }
+            } else {
+                JsonArray array = resp.bodyAsJsonArray();
+                return array.stream().map(o -> (JsonObject) o).map(j -> j.getString("id"))
+                        .collect(Collectors.toList());
+            }
         });
     }
 }
